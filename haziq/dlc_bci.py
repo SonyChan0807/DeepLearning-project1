@@ -85,8 +85,8 @@ def load(root, train = True, download = True, one_khz = False):
 
 def train_model(model, train_input, train_target, train_mini_batch_size, test_input, test_target, test_mini_batch_size, epoch):
         
-    criterion = nn.MSELoss()
-    #criterion = nn.CrossEntropyLoss()
+    #criterion = nn.MSELoss()
+    criterion = nn.CrossEntropyLoss()
     tr_loss_all = []
     te_loss_all = []
     eta = 1e-2
