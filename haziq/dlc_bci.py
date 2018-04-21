@@ -89,7 +89,7 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
     criterion = nn.CrossEntropyLoss()
     tr_loss_all = []
     te_loss_all = []
-    eta = 1e-2
+    eta = 5e-3
 
     for e in range(0, epoch):
         
