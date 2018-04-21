@@ -125,12 +125,12 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
       
     return tr_loss_all, te_loss_all
         
-def compute_nb_errors(model, input, target, mini_batch_size):
+def compute_nb_errors(model, input, target, mini_batch_size, mode):
 
     nb_errors = 0
 
     for b in range(0, input.size(0), mini_batch_size):
-        output = model(input.narrow(0, b, mini_batch_size))
+        output = model(input.narrow(0, b, mini_batch_size), mode)
         _, predicted_classes = output.data.max(1)
         for k in range(0, mini_batch_size):
             if target.data[b + k, predicted_classes[k]] < 0:
