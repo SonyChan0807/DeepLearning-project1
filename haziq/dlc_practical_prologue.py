@@ -48,9 +48,12 @@ if torch.cuda.is_available() and not args.force_cpu:
 
 def convert_to_one_hot_labels(input, target):
     tmp = input.new(target.size(0), target.max() + 1).fill_(-1)
-    for k in range(0, target.size(0)):
-        tmp[k, target[k]] = 1
+    tmp.scatter_(1, target.view(-1, 1), 1.0)
     return tmp
+    #tmp = input.new(target.size(0), target.max() + 1).fill_(-1)
+    #for k in range(0, target.size(0)):
+    #    tmp[k, target[k]] = 1
+    #return tmp
 
 def load_data(cifar = None, one_hot_labels = False, normalize = False, flatten = True):
 
