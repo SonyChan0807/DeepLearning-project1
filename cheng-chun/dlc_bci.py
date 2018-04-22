@@ -90,6 +90,7 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
     tr_loss_all = []
     te_loss_all = []
     eta = 1e-2
+    # eta = 1e-3
 
     for e in range(0, epoch):
         
@@ -118,8 +119,12 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
             output = model(test_input.narrow(0, b, test_mini_batch_size), False)
             loss = criterion(output, test_target.narrow(0, b, test_mini_batch_size))
             te_loss = te_loss + loss.data[0]        
-            
-        print('epoch {:d} tr loss {:0.2f} te loss {:0.2f}'.format(e, tr_loss, te_loss*3.16))
+        if e % 20 == 0:
+            print('epoch {:d} tr loss {:0.2f} te loss {:0.2f}'.format(e, tr_loss, te_loss*3.16))
+            num_correct = np.sum((torch.max(F.softmax(model(train_input), 1), 1)[1] == train_target).data.numpy())
+            print('tr acc = {:0.2f}'.format(num_correct/train_target.shape[0]))
+            num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+            print('te acc = {:0.2f}'.format(num_correct/test_target.shape[0]))
         tr_loss_all.append(tr_loss)
         te_loss_all.append(te_loss)
       
