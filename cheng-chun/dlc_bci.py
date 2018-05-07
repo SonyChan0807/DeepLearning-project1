@@ -84,7 +84,7 @@ def load(root, train = True, download = True, one_khz = False):
 
     return input, target
 
-def train_model(model, train_input, train_target, train_mini_batch_size, test_input, test_target, test_mini_batch_size, epoch):
+def train_model(model_name, model, train_input, train_target, train_mini_batch_size, val_input, val_target, val_mini_batch_size, test_input, test_target, test_mini_batch_size, epoch):
         
     # criterion = nn.MSELoss()
     criterion = nn.CrossEntropyLoss()
@@ -92,15 +92,20 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
     te_loss_all = []
     eta = 1e-2
     # eta = 1e-3
-
     # optimizer = torch.optim.SGD(model.parameters(), lr = eta)
     optimizer = torch.optim.Adam(model.parameters())
     # optimizer = torch.optim.Adadelta(model.parameters(), lr = eta)
+
+    path = os.getcwd() +'/models/' + model_name
+    # path = '/home/cheng-chun-epfl/Dropbox/EPFL/course/MA2/deep learning/min-project/cheng-chun/models/' + model_name
+    te_acc_max = 0
+
     for e in range(0, epoch):
         
         tr_loss = 0
         te_loss = 0
-                
+        val_loss = 0
+        print("epoch ", e)
         # iterate through training set
         for b in range(0, train_input.size(0), train_mini_batch_size):
             
@@ -124,15 +129,38 @@ def train_model(model, train_input, train_target, train_mini_batch_size, test_in
             output = model(test_input.narrow(0, b, test_mini_batch_size), False)
             loss = criterion(output, test_target.narrow(0, b, test_mini_batch_size))
             te_loss = te_loss + loss.data[0]        
+
+        # iterate through val set
+        for b in range(0, val_input.size(0), val_mini_batch_size):
+            
+            # feedforward and compute loss
+            output = model(val_input.narrow(0, b, val_mini_batch_size), False)
+            loss = criterion(output, val_target.narrow(0, b, val_mini_batch_size))
+            val_loss = val_loss + loss.data[0]  
+
+
         # if e % 20 == 0:
-        print('epoch {:d} tr loss {:0.2f} te loss {:0.2f}'.format(e, tr_loss, te_loss*3.16))
+        # print('epoch {:d} tr loss {:0.2f} te loss {:0.2f}'.format(e, tr_loss, te_loss*3.16))
         num_correct = np.sum((torch.max(F.softmax(model(train_input), 1), 1)[1] == train_target).data.numpy())
         print('tr acc = {:0.2f}'.format(num_correct/train_target.shape[0]))
+        
         num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
-        print('te acc = {:0.2f}'.format(num_correct/test_target.shape[0]))
-        tr_loss_all.append(tr_loss)
-        te_loss_all.append(te_loss)
-      
+        te_acc = num_correct/test_target.shape[0]
+        print('te acc = {:0.2f}'.format(te_acc))
+
+        num_correct = np.sum((torch.max(F.softmax(model(val_input), 1), 1)[1] == val_target).data.numpy())
+        val_acc = num_correct/val_target.shape[0]
+        print('val acc = {:0.2f}'.format(val_acc))
+
+        if te_acc_max < te_acc:
+            torch.save(model.state_dict(), path)
+            print('save the current best: {:0.2f}'.format(te_acc))
+            te_acc_max = te_acc
+
+        # tr_loss_all.append(tr_loss)
+        # te_loss_all.append(te_loss)
+    
+    # print('best model in this model: {:0.2f}'.format(te_acc_max))
     return tr_loss_all, te_loss_all
         
 def compute_nb_errors(model, input, target, mini_batch_size):
