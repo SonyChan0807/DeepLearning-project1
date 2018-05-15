@@ -101,7 +101,12 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
     path = os.getcwd() +'/models/' + model_name
     # path = '/home/cheng-chun-epfl/Dropbox/EPFL/course/MA2/deep learning/min-project/cheng-chun/models/' + model_name
     te_acc_max = 0
-    val_acc_max = 0
+    va_acc_best = 0
+    va_loss_best = 10
+    tr_loss_best = 10
+    te_acc_best = 0
+
+
     for e in range(0, epoch):
         
         # tr_loss = 0
@@ -181,9 +186,29 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
         loss = criterion(output, train_target)
         tr_loss = loss.data[0] 
         
-        if e == epoch - 1:
-        # if (e+1)%20 == 0:
-            print('epoch {:d} tr loss {:0.2f}  val loss {:0.2f} te loss {:0.2f}'.format(e, tr_loss, va_loss, te_loss))
+        num_correct = np.sum((torch.max(F.softmax(model(val_input), 1), 1)[1] == val_target).data.numpy())
+        va_acc = num_correct/val_target.shape[0]
+
+        # if va_acc_best < va_acc:
+        if va_loss_best > va_loss:
+
+            va_loss_best = va_loss
+            tr_loss_best = tr_loss
+            num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+            te_acc_best = num_correct/test_target.shape[0]
+
+            num_correct = np.sum((torch.max(F.softmax(model(train_input), 1), 1)[1] == train_target).data.numpy())
+            tr_acc_best = num_correct/train_target.shape[0]
+                    
+            num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+            te_acc_best = num_correct/test_target.shape[0]
+
+            va_acc_best = va_acc
+            # num_correct = np.sum((torch.max(F.softmax(model(val_input), 1), 1)[1] == val_target).data.numpy())
+            # val_acc_best = num_correct/val_target.shape[0]
+        # if e == epoch - 1:
+        if (e+1)%20 == 0:
+            print('epoch {:d} tr loss {:0.2f}  val loss {:0.2f} te loss {:0.2f}'.format(e+1, tr_loss, va_loss, te_loss))
 
             num_correct = np.sum((torch.max(F.softmax(model(train_input), 1), 1)[1] == train_target).data.numpy())
             print('tr acc = {:0.2f}'.format(num_correct/train_target.shape[0]))
@@ -195,14 +220,17 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
             #     print('epoch: ', e, ', te acc = {:0.2f}'.format(te_acc))
             #     break
             
-            num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
-            te_acc = num_correct/test_target.shape[0]
-            print('te acc = {:0.2f}'.format(num_correct/test_target.shape[0]))
+            # num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+            # te_acc = num_correct/test_target.shape[0]
+            # print('te acc = {:0.2f}'.format(num_correct/test_target.shape[0]))
 
             num_correct = np.sum((torch.max(F.softmax(model(val_input), 1), 1)[1] == val_target).data.numpy())
             val_acc = num_correct/val_target.shape[0]
             print('val acc = {:0.2f}'.format(val_acc))
-
+        
+        # num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+        # te_acc = num_correct/test_target.shape[0]
+        # print('te acc = {:0.2f}'.format(num_correct/test_target.shape[0]))
 
 
             # print('current best val acc: {:0.2f}'.format(val_acc_max))
@@ -215,9 +243,25 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
         # te_loss_all.append(te_loss)
         va_loss_all.append(va_loss)
 
-    
+        # if va_loss <= 0.4:
+        #     break
+
     # print('best model in this model: {:0.2f}'.format(te_acc_max))
-    return tr_loss_all, va_loss_all, te_acc
+    print('best')
+    print('epoch {:d} tr loss {:0.2f}  val loss {:0.2f}'.format(e, tr_loss_best, va_loss_best))
+
+    # num_correct = np.sum((torch.max(F.softmax(model(train_input), 1), 1)[1] == train_target).data.numpy())
+    print('tr acc = {:0.2f}'.format(tr_acc_best))
+            
+    # num_correct = np.sum((torch.max(F.softmax(model(test_input), 1), 1)[1] == test_target).data.numpy())
+    # te_acc = num_correct/test_target.shape[0]
+    print('te acc = {:0.2f}'.format(te_acc_best))
+
+    # num_correct = np.sum((torch.max(F.softmax(model(val_input), 1), 1)[1] == val_target).data.numpy())
+    # val_acc = num_correct/val_target.shape[0]
+    print('val acc = {:0.2f}'.format(va_acc_best))
+
+    return tr_loss_all, va_loss_all, te_acc_best, va_acc_best, tr_acc_best
         
 def compute_nb_errors(model, input, target, mini_batch_size):
 
