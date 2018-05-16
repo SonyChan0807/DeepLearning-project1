@@ -262,6 +262,73 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
     print('val acc = {:0.2f}'.format(va_acc_best))
 
     return tr_loss_all, va_loss_all, te_acc_best, va_acc_best, tr_acc_best
+
+def train_model_haziq(model, train_input, train_target, tr_target_onehot, train_mini_batch_size, test_input, test_target, te_target_onehot, test_mini_batch_size, epoch):
+              
+    # initialize empty lists to collect
+    # train and test accuracies and losses
+    tr_loss_all = []
+    te_loss_all = [] 
+    tr_acc_all = []
+    te_acc_all = []     
+    
+    # Optimizer
+    criterion = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(model.parameters())
+
+    # Iterate for epochs
+    for e in range(0, epoch):
+        
+        tr_acc  = 0
+        te_acc  = 0        
+        tr_loss  = 0
+        te_loss  = 0
+                
+        # iterate through training set
+        for b in range(0, np.shape(train_input)[0], train_mini_batch_size):
+            
+            # feedforward and compute loss
+            output = model(train_input.narrow(0, b, train_mini_batch_size), True)
+            loss = criterion(output, train_target.narrow(0, b, train_mini_batch_size))
+            tr_loss = tr_loss + loss.data[0]
+            
+            # backpropagate
+            model.zero_grad()
+            loss.backward()
+            optimizer.step()
+                    
+        # iterate through test set
+        for b in range(0, np.shape(test_input)[0], test_mini_batch_size):
+          
+            # feedforward and compute loss
+            output = model(test_input.narrow(0, b, test_mini_batch_size), False)
+            loss = criterion(output, test_target.narrow(0, b, test_mini_batch_size))
+            te_loss = te_loss + loss.data[0]      
+            
+        # compute accuracy
+        tr_acc  = compute_accuracy(model, train_input, tr_target_onehot,  train_mini_batch_size)
+        te_acc  = compute_accuracy(model, test_input,  te_target_onehot,  test_mini_batch_size)
+        print('epoch {:d} tr loss {:0.2f} val loss {:0.2f} tr acc {:f} val acc {:f}'.format(e, tr_loss, te_loss, tr_acc, te_acc))
+               
+        # accumulate train, val loss and accuracies   
+        tr_acc_all.append(tr_acc)
+        te_acc_all.append(te_acc)      
+    
+    return tr_acc_all, te_acc_all #, tr_loss_all, te_loss_all
+
+# compute accuracy
+def compute_accuracy(model, input, target, mini_batch_size, mode = False):
+
+    accuracy = 0
+
+    for b in range(0, input.size(0), mini_batch_size):
+        output = model(input.narrow(0, b, mini_batch_size), mode)
+        _, predicted_classes = output.data.max(1)
+        for k in range(0, mini_batch_size):
+            if(target.data[b + k, predicted_classes[k]] >= 0):
+                accuracy = accuracy + 1
+
+    return accuracy/input.size(0)
         
 def compute_nb_errors(model, input, target, mini_batch_size):
 
