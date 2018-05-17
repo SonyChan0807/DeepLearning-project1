@@ -13,6 +13,22 @@ from torch.autograd import Variable
 from scipy.signal import hilbert, chirp
 from scipy import signal
 
+def replicate_samples(tr_input, tr_target, no_samples):
+    
+ 
+    """Function to replicate data through random sampling
+    Args:
+        tr_input       (torch.FloatTensor) : Tensor with first dimension as the number of samples eg N x C x L
+        tr_target      (torch.FloatTensor) : Tensor with first dimension as the number of samples eg N x C x L
+        no_samples     (int)               : number of additional samples to generate
+    """     
+    
+    ind       = np.random.choice(np.arange(0,np.shape(tr_input)[0]), no_samples)[None]
+    tr_input  = torch.cat((tr_input, tr_input[ind]))
+    tr_target = torch.cat((tr_target, tr_target[ind]))
+    
+    return tr_input, tr_target
+
 def cross_validation_batch(size, k):
     """Function to generate indices for k-fold cross validation
     Args:
