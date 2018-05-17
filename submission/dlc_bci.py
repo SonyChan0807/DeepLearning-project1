@@ -265,6 +265,27 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
 
 def train_model_haziq(model, train_input, train_target, tr_target_onehot, train_mini_batch_size, test_input, test_target, te_target_onehot, test_mini_batch_size, epoch):
               
+    """Function to train the model given the training and validation set. 
+    Args:
+        model                                     : class containing PyTorch model and the forward pass method (see nn_models.py)
+        
+        train_input           (torch.FloatTensor) : train samples with dimension (number of train samples x rows x columns)
+        train_target          (torch.FloatTensor) : train categorical labels with dimension (number of test samples x 1)
+        train_target_onehot   (torch.FloatTensor) : train onehot labels with dimension (number of test samples x no. of classes)
+        train_mini_batch_size (int)               : size of training batch per iteration
+        
+        test_input            (torch.FloatTensor) : test samples with dimension (number of test samples x rows x columns)
+        test_target           (torch.FloatTensor) : test categorical labels with dimension (number of test samples x 1)
+        test_target_onehot    (torch.FloatTensor) : test one-hot labels with dimension (number of test samples x no. of classes)
+        test_mini_batch_size  (int)               : size of test batch per iteration
+        
+    Returns:
+        model                                     : class containing the trained PyTorch model
+        tr_acc_all                                : training accuracies obtained at each epoch
+        te_acc_all                                : test accuracies obtained at each epoch
+        
+    """  
+                
     # initialize empty lists to collect
     # train and test accuracies and losses
     tr_loss_all = []
@@ -317,21 +338,45 @@ def train_model_haziq(model, train_input, train_target, tr_target_onehot, train_
     return tr_acc_all, te_acc_all #, tr_loss_all, te_loss_all
 
 # compute accuracy
-def compute_accuracy(model, input, target, mini_batch_size, mode = False):
+def compute_accuracy(model, input, target_onehot, mini_batch_size, mode = False):
 
+    """Function to compute accuracy
+    Args:
+        model                                     : Class containing PyTorch model and the forward pass method (see nn_models.py)        
+        input                 (torch.FloatTensor) : test samples with dimension (number of train samples x rows x columns)
+        target_onehot         (torch.FloatTensor) : test onehot labels with dimension (number of test samples x no. of classes)
+        train_target_onehot   (torch.FloatTensor) : train onehot labels with dimension (number of test samples x no. of classes)
+        mini_batch_size       (int)               : size of batch per iteration
+        
+    Returns:
+        accuracy              (float)             : accuracy of the model in percentage points
+    """ 
+    
     accuracy = 0
 
     for b in range(0, input.size(0), mini_batch_size):
         output = model(input.narrow(0, b, mini_batch_size), mode)
         _, predicted_classes = output.data.max(1)
         for k in range(0, mini_batch_size):
-            if(target.data[b + k, predicted_classes[k]] >= 0):
+            if(target_onehot.data[b + k, predicted_classes[k]] >= 0):
                 accuracy = accuracy + 1
 
     return accuracy/input.size(0)
         
 def compute_nb_errors(model, input, target, mini_batch_size):
 
+    """Function to compute accuracy
+    Args:
+        model                                     : Class containing PyTorch model and the forward pass method (see nn_models.py)        
+        input                 (torch.FloatTensor) : test samples with dimension (number of train samples x rows x columns)
+        target_onehot         (torch.FloatTensor) : test onehot labels with dimension (number of test samples x no. of classes)
+        train_target_onehot   (torch.FloatTensor) : train onehot labels with dimension (number of test samples x no. of classes)
+        mini_batch_size       (int)               : size of batch per iteration
+        
+    Returns:
+        error                 (int)               : number of misclassified samples
+    """ 
+    
     nb_errors = 0
 
     for b in range(0, input.size(0), mini_batch_size):

@@ -13,14 +13,31 @@ from torch.autograd import Variable
 from scipy.signal import hilbert, chirp
 from scipy import signal
 
-def replicate_samples(tr_input, tr_target, no_samples):
+def convert_to_one_hot_labels(input, target):
+    """Function to convert 2 class categorical labels to one-hot labels
+    Args:
+        input       (torch.FloatTensor) : Tensor with dimensions as (number of samples x rows x columns)
+        target      (torch.FloatTensor) : Tensor with dimensions as (number of samples x 1)
+        
+    Returns:
+        tmp         (torch.FloatTensor) : Tensor with dimensions as (number of samples x number of classes)  
+    """
     
- 
+    tmp = input.new(target.size(0), target.max() + 1).fill_(-1)
+    for k in range(0, target.size(0)):
+        tmp[k, target[k]] = 1
+    return tmp
+
+def replicate_samples(tr_input, tr_target, no_samples):   
     """Function to replicate data through random sampling
     Args:
-        tr_input       (torch.FloatTensor) : Tensor with first dimension as the number of samples eg N x C x L
-        tr_target      (torch.FloatTensor) : Tensor with first dimension as the number of samples eg N x C x L
+        tr_input       (torch.FloatTensor) : Tensor with dimensions as (number of samples x rows x columns)
+        tr_target      (torch.FloatTensor) : Tensor with dimensions as (number of samples x 1)
         no_samples     (int)               : number of additional samples to generate
+        
+    Returns:
+        tr_input       (torch.FloatTensor) : Tensor with dimensions as ([number of samples + nb_samples] x rows x columns)
+        tr_input       (torch.FloatTensor) : Tensor with dimensions as ([number of samples + nb_samples] x 1)    
     """     
     
     ind       = np.random.choice(np.arange(0,np.shape(tr_input)[0]), no_samples)[None]
