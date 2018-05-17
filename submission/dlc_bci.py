@@ -283,28 +283,42 @@ def train_model_haziq(model, train_input, train_target, tr_target_onehot, train_
         te_acc  = 0        
         tr_loss  = 0
         te_loss  = 0
-                
+
         # iterate through training set
         for b in range(0, np.shape(train_input)[0], train_mini_batch_size):
-            
+            if b + train_mini_batch_size > train_input.size(0):
+                shift = train_input.size(0) - b
+            else:
+                shift = train_mini_batch_size
+            # print(shift)
             # feedforward and compute loss
-            output = model(train_input.narrow(0, b, train_mini_batch_size), True)
-            loss = criterion(output, train_target.narrow(0, b, train_mini_batch_size))
+            # output = model(train_input.narrow(0, b, train_mini_batch_size), True)
+            # loss = criterion(output, train_target.narrow(0, b, train_mini_batch_size))
+
+            output = model(train_input.narrow(0, b, shift), True)
+            loss = criterion(output, train_target.narrow(0, b, shift))
+
             tr_loss = tr_loss + loss.data[0]
             
             # backpropagate
             model.zero_grad()
             loss.backward()
             optimizer.step()
-                    
+        
         # iterate through test set
         for b in range(0, np.shape(test_input)[0], test_mini_batch_size):
-          
+            if b + test_mini_batch_size > test_input.size(0):
+                shift = test_input.size(0) - b
+            else:
+                shift = test_mini_batch_size
+            # print(shift)
             # feedforward and compute loss
-            output = model(test_input.narrow(0, b, test_mini_batch_size), False)
-            loss = criterion(output, test_target.narrow(0, b, test_mini_batch_size))
+            # output = model(test_input.narrow(0, b, test_mini_batch_size), False)
+            # loss = criterion(output, train_target.narrow(0, b, train_mini_batch_size))
+            output = model(train_input.narrow(0, b, shift), True)
+            loss = criterion(output, test_target.narrow(0, b, shift))
+
             te_loss = te_loss + loss.data[0]      
-            
         # compute accuracy
         tr_acc  = compute_accuracy(model, train_input, tr_target_onehot,  train_mini_batch_size)
         te_acc  = compute_accuracy(model, test_input,  te_target_onehot,  test_mini_batch_size)
@@ -322,9 +336,17 @@ def compute_accuracy(model, input, target, mini_batch_size, mode = False):
     accuracy = 0
 
     for b in range(0, input.size(0), mini_batch_size):
-        output = model(input.narrow(0, b, mini_batch_size), mode)
+        if b + mini_batch_size > input.size(0):
+            shift = input.size(0) - b
+        else:
+            shift = mini_batch_size
+
+        # output = model(input.narrow(0, b, mini_batch_size), mode)
+        output = model(input.narrow(0, b, shift), mode)
+
         _, predicted_classes = output.data.max(1)
-        for k in range(0, mini_batch_size):
+        # for k in range(0, mini_batch_size):
+        for k in range(0, shift):
             if(target.data[b + k, predicted_classes[k]] >= 0):
                 accuracy = accuracy + 1
 

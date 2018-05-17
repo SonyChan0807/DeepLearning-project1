@@ -8,7 +8,7 @@ from torch.autograd import Variable
 import dlc_bci as bci
 import plot_lib as plib
 import preprocess as prep
-from nn_models import ConvNet2
+from nn_models import ConvNet3
 from dlc_practical_prologue import *
 
 if __name__ == "__main__":
@@ -24,7 +24,7 @@ if __name__ == "__main__":
 	# convert output to variable
 	tr_target_onehot = Variable(tr_target_onehot)
 	te_target_onehot = Variable(te_target_onehot)
-	tr_target_org = Variable(tr_target)
+	tr_target = Variable(tr_target)
 	te_target = Variable(te_target)
 
 	# normalization
@@ -39,9 +39,15 @@ if __name__ == "__main__":
 	tr_input = Variable(tr_input)
 	te_input = Variable(te_input)
 
-	model = ConvNet2()
+	model = ConvNet3()
 	# print(torch.load('models/best4.pth'))
-	model.load_state_dict(torch.load('models/best_conv2.pth'))
+	# model.load_state_dict(torch.load('models/best_conv2.pth'))
+	# print(type(tr_input))
+	# print(type(te_input))
+	# print(type(tr_target))
+	# print(type(te_target))
+
+	bci.train_model_haziq(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
 
 	nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
 	print('accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
