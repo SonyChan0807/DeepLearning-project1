@@ -41,18 +41,18 @@ if __name__ == "__main__":
     tr_input = Variable(tr_input)
     te_input = Variable(te_input)
 
-    print("Our best model: CNN......")
+    print("Our best model: CNN")
     # CNN Model
     # ----------
     model = ConvNet3()
     bci.train_model(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
 
     nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
-    print('CNN accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
+    print('CNN accuracy = {:0.2f} \n'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
     
     
     
-    print("Other model: LSTM......")
+    print("Other model: LSTM")
     # LSTM Model
     # ----------
     model = LSTM(feature_dim = 28, hidden_size=25, batch_size=10)
