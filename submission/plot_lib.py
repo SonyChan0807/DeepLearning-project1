@@ -12,8 +12,6 @@ from scipy import signal
 
 # customized library
 import dlc_bci as bci
-from dlc_practical_prologue import *
-
 
 def plot_channel(inputs, targets, ch = 2, num = 4):
     """Function to plot the time series given number of channels and number of data

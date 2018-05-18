@@ -84,7 +84,7 @@ def load(root, train = True, download = True, one_khz = False):
 
     return input, target
 
-def train_model(model_name, model, train_input, train_target, train_mini_batch_size, val_input, val_target, test_input, test_target, epoch):
+def train_model_edited(model_name, model, train_input, train_target, train_mini_batch_size, val_input, val_target, test_input, test_target, epoch):
         
     # criterion = nn.MSELoss()
     criterion = nn.CrossEntropyLoss()
@@ -263,7 +263,7 @@ def train_model(model_name, model, train_input, train_target, train_mini_batch_s
 
     return tr_loss_all, va_loss_all, te_acc_best, va_acc_best, tr_acc_best
 
-def train_model_haziq(model, train_input, train_target, tr_target_onehot, train_mini_batch_size, test_input, test_target, te_target_onehot, test_mini_batch_size, epoch):
+def train_model(model, train_input, train_target, tr_target_onehot, train_mini_batch_size, test_input, test_target, te_target_onehot, test_mini_batch_size, epoch):
               
     """Function to train the model given the training and validation set. 
     Args:
@@ -378,14 +378,9 @@ def compute_accuracy(model, input, target_onehot, mini_batch_size, mode = False)
         output = model(input.narrow(0, b, shift), mode)
 
         _, predicted_classes = output.data.max(1)
-<<<<<<< HEAD
-        for k in range(0, mini_batch_size):
-            if(target_onehot.data[b + k, predicted_classes[k]] >= 0):
-=======
         # for k in range(0, mini_batch_size):
         for k in range(0, shift):
-            if(target.data[b + k, predicted_classes[k]] >= 0):
->>>>>>> e29ff2504a713776189bd567b83cfb5cc52c08f8
+            if(target_onehot.data[b + k, predicted_classes[k]] >= 0):
                 accuracy = accuracy + 1
 
     return accuracy/input.size(0)

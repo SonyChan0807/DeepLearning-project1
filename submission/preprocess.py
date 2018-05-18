@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import dlc_bci as bci
-from dlc_practical_prologue import *
 
 import torch
 from torch import nn
