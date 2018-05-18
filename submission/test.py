@@ -51,30 +51,31 @@ if __name__ == "__main__":
     print('CNN accuracy = {:0.2f} \n'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
     
     
+    # The codes for LSTM, you can uncomment them to test if you want
+
+    # print("Other model: LSTM")
+    # # LSTM Model
+    # # ----------
+    # model = LSTM(feature_dim = 28, hidden_size=25, batch_size=10)
     
-    print("Other model: LSTM")
-    # LSTM Model
-    # ----------
-    model = LSTM(feature_dim = 28, hidden_size=25, batch_size=10)
+    # # Rearrange data
+    # tr_input = np.transpose(tr_input_org, (0,2,1))
+    # te_input = np.transpose(te_input_org, (0,2,1))
     
-    # Rearrange data
-    tr_input = np.transpose(tr_input_org, (0,2,1))
-    te_input = np.transpose(te_input_org, (0,2,1))
+    # # Append training samples since PyTorch LSTM requires a fixed batch size
+    # tr_input, tr_target = prep.replicate_samples(tr_input, tr_target_org, 4)
     
-    # Append training samples since PyTorch LSTM requires a fixed batch size
-    tr_input, tr_target = prep.replicate_samples(tr_input, tr_target_org, 4)
+    # # Prepare one-hot encoding for PyTorch computation of loss
+    # tr_target_onehot = prep.convert_to_one_hot_labels(tr_input, tr_target)
     
-    # Prepare one-hot encoding for PyTorch computation of loss
-    tr_target_onehot = prep.convert_to_one_hot_labels(tr_input, tr_target)
+    # # convert input to variable
+    # tr_input  = Variable(tr_input)
+    # tr_target = Variable(tr_target)
+    # tr_target_onehot = Variable(tr_target_onehot)
+    # te_input = Variable(te_input)
     
-    # convert input to variable
-    tr_input  = Variable(tr_input)
-    tr_target = Variable(tr_target)
-    tr_target_onehot = Variable(tr_target_onehot)
-    te_input = Variable(te_input)
+    # # train LSTM
+    # tr_acc, te_acc = bci.train_model(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
     
-    # train LSTM
-    tr_acc, te_acc = bci.train_model(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
-    
-    nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
-    print('LSTM accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
+    # nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
+    # print('LSTM accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))

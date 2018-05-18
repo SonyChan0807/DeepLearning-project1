@@ -13,15 +13,17 @@ class ConvNet(nn.Module):
         
     def forward(self, x, mode=False):
         
-        # convolve
+        # 1st conv layer
         x = self.conv1(x)
         x = F.max_pool1d(F.relu(x),4)
 
+        # 1st FC layer
         x = x.view(-1, x.size(1) * x.size(2))
         x = self.linear1(x)
         x = F.dropout(x, p=0.6, training=mode)
         x = F.relu(x)        
 
+        # 2nd FC layer
         x = self.output(x)
         
         return x
@@ -35,17 +37,18 @@ class ConvNet2(nn.Module):
         
     def forward(self, x, mode=False):
         
-        # convolve
+        # 1st conv layer
         x = self.conv1(x)
         x = F.max_pool1d(F.relu(x),4)
         x = x.view(-1, x.size(1) * x.size(2))
 
+        # 1st FC layer
         x = self.linear1(x)
         x = F.dropout(x, p=0.6, training=mode)
         x = F.relu(x)        
 
+        # 2nd FC layer
         x = self.output(x)
-        x = F.dropout(x, p=0.6, training=mode)
         
         return x
 
@@ -58,8 +61,13 @@ class ConvNet3(nn.Module):
         self.linear = nn.Linear(96, 2)
         
     def forward(self, x, mode=False):
+        # 1st conv layer
         x = self.conv1(x)
+
+        # 2nd conv layer
         x = self.conv2(x)
+
+        # 1st FC layer
         x = x.view(-1, x.size(1) * x.size(3))        
         x = self.linear(x)
         
@@ -74,8 +82,14 @@ class ConvNet4(nn.Module):
         self.linear = nn.Linear(108, 2)
         
     def forward(self, x, mode=False):
+
+        # 1st conv layer
         x = self.conv1(x)
+
+        # 2nd conv layer
         x = self.conv2(x)
+
+        # 1st FC layer
         x = x.view(-1, x.size(1) * x.size(3))        
         x = self.linear(x)
         

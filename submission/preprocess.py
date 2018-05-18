@@ -219,9 +219,14 @@ def peak_detector(signal, N):
     
     return result
 def peak_detector_filtering(signal, N):
+    """Function to fetch the local max in time series
+    Args:
+        signal        (torch.FloatTensor): Matrix with size N x C x L
+        N             (int)              : 
+    """    
+
     sample = peak_detector(signal[0,0,:].numpy(), N)
     
-#     print(signal[0,0,:].shape[0])
     signal_filtered = torch.zeros([signal.shape[0], signal.shape[1], sample.shape[0]])
 
     for idx1, data in enumerate(signal):
@@ -231,6 +236,12 @@ def peak_detector_filtering(signal, N):
     return signal_filtered    
 
 def channel_used(signal, reserve_list):
+    """Function to choose the channels to be used
+    Args:
+        signal        (torch.FloatTensor): Matrix with size N x C x L
+        reserve_list  (list)             : list to indicate which channel to be reserved 
+    """    
+
     signal_filtered = torch.zeros([signal.shape[0], len(reserve_list), signal.shape[2]])
     
     for idx, ch in enumerate(reserve_list):
@@ -239,6 +250,13 @@ def channel_used(signal, reserve_list):
     return signal_filtered
 
 def augment(signal, target, increase_size):
+    """Function to augment the data
+    Args:
+        input         (torch.FloatTensor) : Tensor with dimensions as (number of samples x rows x columns)
+        target        (torch.FloatTensor) : Tensor with dimensions as (number of samples x 1)
+        increase_size (int)               : the number of data to be increased
+    """
+
     tmp = torch.zeros(increase_size, signal.size(1), signal.size(2))
     aug_target = torch.zeros(increase_size)
     ind_max = signal.size(0)
@@ -261,4 +279,3 @@ def augment(signal, target, increase_size):
         tmp[i,:,:] = (a+b)/2
     
     return torch.cat((signal, tmp), 0), torch.cat((target, Variable(aug_target.long())), 0)
-#     return (torch.cat((signal, tmp), 0)
