@@ -12,6 +12,9 @@ from nn_models import ConvNet3, LSTM
 
 if __name__ == "__main__":
 
+    
+
+    print("Loading the dataset......")
     # load dataset
     tr_input_org, tr_target_org = bci.load("bci", train=True, one_khz=False)
     te_input_org, te_target_org = bci.load("bci", train=False, one_khz=False)
@@ -38,14 +41,18 @@ if __name__ == "__main__":
     tr_input = Variable(tr_input)
     te_input = Variable(te_input)
 
+    print("Our best model: CNN......")
     # CNN Model
     # ----------
     model = ConvNet3()
     bci.train_model(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
 
     nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
-    print('accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
+    print('CNN accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
     
+    
+    
+    print("Other model: LSTM......")
     # LSTM Model
     # ----------
     model = LSTM(feature_dim = 28, hidden_size=25, batch_size=10)
@@ -70,4 +77,4 @@ if __name__ == "__main__":
     tr_acc, te_acc = bci.train_model(model, tr_input, tr_target, tr_target_onehot, 10, te_input, te_target, te_target_onehot, 10, 200)
     
     nb_errors = bci.compute_nb_errors(model, te_input, te_target_onehot, 10)
-    print('accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
+    print('LSTM accuracy = {:0.2f}'.format((te_input.shape[0]-nb_errors)/te_input.shape[0]))
