@@ -7,9 +7,6 @@ We experiment with deep neural networks for the prediction of finger movements f
   * [Requirements](#requirements)
   * [Brief Project Structure](#brief-project-structure)
   * [Usage](#usage)
-  * [Results](#results)
-    * [Model Accuracies](#model-accuracies)
-    * [Loss Plots](#loss-plots)
 
 # Requirements
 ------------
@@ -33,30 +30,8 @@ We experiment with deep neural networks for the prediction of finger movements f
 ------------
 
 #### Best Model
-To run our best model, simply `$ git clone` the repository then run `$ python run.py` 
+To run our best model, simply `$ git clone` the repository then run `$ submissions/python run.py` 
 
 #### Other Models
 The other models in `.ipynb` are stored in the `models` folder. 
-
-# Results
-------------
-## Model Accuracies
-
-| **Method**  | **Train** | **Val** | **Test** |
-| ------------- | ------------- | ------------- | ------------- |
-| SVM | |   | |
-| Naive Bayes | | | |
-| 3 Layered MLP | | | |
-
-| **Architecture**  | **Train** | **Val** | **Test** |
-| ------------- | ------------- | ------------- | ------------- |
-| CNN (28 x 28 x 3), FC (25,2) | 90 ± 1% | | |
-| CNN (28 x 28 x 3, 28 x 28 x 3), FC (25,25,2) | | |  |
-
-| **Architecture**  | **Train** | **Val** | **Test** |
-| ------------- | ------------- | ------------- | ------------- |
-| LSTM (25), FC (25,2) |  |  |  |
-| LSTM (25), FC (25,25,2) |  | | |
-
-## Loss Plots
 
