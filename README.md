@@ -32,6 +32,3 @@ We experiment with deep neural networks for the prediction of finger movements f
 #### Best Model
 To run our best model, simply `$ git clone` the repository then run `$ submissions/python run.py` 
 
-#### Other Models
-The other models in `.ipynb` are stored in the `models` folder. 
-
