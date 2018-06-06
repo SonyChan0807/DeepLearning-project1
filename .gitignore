@@ -1,0 +1,9 @@
+*.pyc
+__pycache__
+.idea*
+*.dat
+/data
+.ipynb_checkpoints
+.DS_Store
+bci
+data_bci
